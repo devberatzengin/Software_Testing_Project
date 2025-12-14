@@ -3,3 +3,6 @@ pandas
 dotenv
 google-generativeai
 numpy
+sklearn
+joblib
+seaborn
