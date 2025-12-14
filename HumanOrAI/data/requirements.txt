@@ -1,0 +1,5 @@
+arxiv
+pandas
+dotenv
+google-generativeai
+numpy
