@@ -12,21 +12,15 @@ load_dotenv()
 
 AI_DATA_FILE = "ai_data_gemini.csv"
 API_KEY = os.getenv("API_KEY")
-SAVE_INTERVAL = 50
-TARGET_COUNT = 3000
-BATCH_SIZE = 5
+SAVE_INTERVAL = 100  # Artık çok hızlıyız, 100'de bir kaydetmek yeterli
+TARGET_COUNT = 31
+00
+BATCH_SIZE = 10  # Tek seferde 10 veri iste (Paid Tier bunu rahat kaldırır)
 
-# --- GÜNCELLENMİŞ VE TEMİZLENMİŞ MODEL LİSTESİ ---
-# Senin 'list_models' çıktına göre SADECE çalışan ve hızlı modelleri ekledim.
-# 404 veren eskiler çıkarıldı.
 MODEL_LIST = [
-    'models/gemini-2.5-flash',
-    'models/gemini-2.0-flash',
-    'models/gemini-2.0-flash-lite-preview-02-05',
-    'models/gemini-2.0-flash-001',
-    'models/gemini-2.0-flash-exp',  # Yeni eklendi (Genelde kotası rahattır)
-    'models/gemini-2.0-flash-lite-001',  # Yeni eklendi
-    'models/gemini-2.0-flash-lite'  # Yeni eklendi
+    'models/gemini-2.5-pro',
+    'models/gemini-2.5-flash'
+
 ]
 
 # Konu Listesi
@@ -44,23 +38,22 @@ TOPICS = [
 if not API_KEY:
     raise ValueError("HATA: GEMINI_API_KEY bulunamadı!")
 
-# Başlangıç yapılandırması
 genai.configure(api_key=API_KEY)
 current_model_index = 0
 
 
 def get_current_model():
-    """Şu anki sıradaki modeli döndürür."""
     model_name = MODEL_LIST[current_model_index]
+    # JSON modu aktif
     return genai.GenerativeModel(model_name, generation_config={"response_mime_type": "application/json"})
 
 
 def switch_model():
-    """Bir sonraki modele geçer."""
+    """Hata durumunda diğer modele geçer."""
     global current_model_index
     current_model_index = (current_model_index + 1) % len(MODEL_LIST)
     new_model_name = MODEL_LIST[current_model_index]
-    print(f"\n🔄 Model Değiştiriliyor -> {new_model_name}\n")
+    print(f"\n⚡ Model Değişiyor -> {new_model_name}\n")
     return get_current_model()
 
 
@@ -94,8 +87,7 @@ def generate_ai_data():
     batch_data = []
     model = get_current_model()
 
-    print(f"\n--- 🚀 MULTI-MODEL Veri Üretimi (Optimize Edildi) ---\n")
-    print(f"📋 Aktif Model Sayısı: {len(MODEL_LIST)}")
+    print(f"\n--- 💎 PREMIUM Veri Üretimi Başlıyor (Batch: {BATCH_SIZE}) ---\n")
 
     try:
         while current_count < TARGET_COUNT:
@@ -104,16 +96,14 @@ def generate_ai_data():
             subject_label = topic_raw.split('(')[-1].strip(')')
 
             prompt = (
-                f"You are an academic AI. Generate {BATCH_SIZE} unique, fake academic research paper abstracts "
-                f"related to '{topic_eng}'. "
-                f"Each abstract must be highly technical, 100-150 words long, and sound like a real publication. "
-                f"Return ONLY a raw JSON list of objects. "
+                f"You are an expert academic researcher. Generate {BATCH_SIZE} unique, highly sophisticated research paper abstracts "
+                f"in the field of '{topic_eng}'. "
+                f"Each abstract must be 120-180 words, use dense technical terminology, and mimic top-tier journal standards. "
+                f"Return ONLY a raw JSON list. "
                 f"JSON Schema: [{{\"title\": \"string\", \"abstract\": \"string\"}}, ...]"
             )
 
             success = False
-            loop_protection = 0
-
             while not success:
                 try:
                     response = model.generate_content(prompt)
@@ -155,38 +145,28 @@ def generate_ai_data():
                             print(
                                 f"✅ +{items_added} Veri | Toplam: {current_count}/{TARGET_COUNT} | Model: {MODEL_LIST[current_model_index]}")
                             success = True
-                            # Başarılı olursa döngü korumasını sıfırla
-                            loop_protection = 0
                         else:
                             success = True
 
-                            # Her başarılı işlemden sonra kısa bir bekleme (Kotayı rahatlatır)
-                        time.sleep(3)
+                            # Bekleme süresini 0.5 saniyeye indirdik! (Paid Tier gücü)
+                        time.sleep(0.5)
 
                 except exceptions.ResourceExhausted:
-                    print(f"⚠️ Kota Doldu ({MODEL_LIST[current_model_index]}) -> Değiştiriliyor...")
+                    # Ücretli planda bile nadiren kota dolabilir, o zaman diğer modele geç
+                    print(f"⚠️ Kota Sınırı ({MODEL_LIST[current_model_index]}) -> Diğer modele geçiliyor...")
                     model = switch_model()
-                    time.sleep(2)
-
-                    loop_protection += 1
-                    # Tüm modelleri denedik ve hepsi hata verdiyse uzun mola ver
-                    if loop_protection >= len(MODEL_LIST):
-                        wait_time = 120  # 2 Dakika tam soğuma
-                        print(f"💤 TÜM MODELLER YORULDU! {wait_time} saniye tam soğuma molası...")
-                        time.sleep(wait_time)
-                        loop_protection = 0  # Sayacı sıfırla ve tekrar dene
+                    time.sleep(1)
 
                 except Exception as e:
-                    print(f"❌ Beklenmedik Hata ({MODEL_LIST[current_model_index]}): {e}")
-                    # 404 gibi kalıcı hatalarda o modeli listeden silmeyi deneyebiliriz ama şimdilik geçelim
+                    print(f"❌ Hata: {e} -> Geçiliyor...")
                     model = switch_model()
-                    time.sleep(2)
+                    time.sleep(1)
 
             # Kaydetme
             if len(batch_data) >= SAVE_INTERVAL:
                 save_batch(batch_data)
                 batch_data = []
-                print(f"💾 Veriler diske yazıldı.")
+                print(f"💾 {SAVE_INTERVAL}+ Veri diske yazıldı.")
 
     except KeyboardInterrupt:
         print("\n⛔ İşlem durduruldu.")
