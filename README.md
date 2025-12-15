@@ -132,3 +132,12 @@ Bu script su adimlari gerceklestirir:
 * Ensemble yapi, tekil modellere gore daha dengeli sonuclar uretir
 
 ---
+
+## SonarQube Analizleri
+
+<img width="1710" height="1112" alt="SonarQube - Train_mdels" src="https://github.com/user-attachments/assets/a8a3da18-75cd-4cf1-afb9-cc6b8536dcfa" />
+---
+<img width="1710" height="1112" alt="SonqrQube - model_service" src="https://github.com/user-attachments/assets/9bcfaf53-29b1-4200-a1f7-2d13190aa726" />
+---
+<img width="1710" height="1112" alt="SonarQube - index" src="https://github.com/user-attachments/assets/17a5d8ee-f732-4db2-94a2-466b5a74c578" />
+---
