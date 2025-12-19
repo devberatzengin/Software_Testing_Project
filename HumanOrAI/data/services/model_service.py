@@ -109,6 +109,9 @@ class ModelService:
         avg_ai = sum([r['ai_prob'] for r in results if r['status']=='success']) / total_valid_models
         avg_human = sum([r['human_prob'] for r in results if r['status']=='success']) / total_valid_models
 
+
+        final_verdict = "AI" if avg_ai > 50 else "HUMAN"
+
         return {
             "individual_results": results,
             "final_verdict": final_verdict,
