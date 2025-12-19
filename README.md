@@ -141,3 +141,11 @@ Bu script su adimlari gerceklestirir:
 ---
 <img width="1710" height="1112" alt="SonarQube - index" src="https://github.com/user-attachments/assets/17a5d8ee-f732-4db2-94a2-466b5a74c578" />
 ---
+
+---
+
+## Scrum Table 
+
+<img width="1710" height="1112" alt="Scrum Table" src="https://github.com/user-attachments/assets/fb0ecf39-b006-4663-adfa-08bce3a1f3d5" />
+
+
