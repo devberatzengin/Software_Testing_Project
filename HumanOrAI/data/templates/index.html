@@ -94,8 +94,8 @@
 
                         <hr>
                         <div class="d-grid gap-2">
-                            <button id="analyzeBtn" type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Analiz
-                                Et</button>
+                            <button id="analyzeBtn" type="submit" class="btn btn-primary"><i class="bi bi-search"></i>
+                                Analiz Et</button>
                             <a href="/reset" class="btn btn-outline-secondary"><i
                                     class="bi bi-arrow-counterclockwise"></i> Sıfırla</a>
                         </div>
@@ -168,34 +168,43 @@
             backgroundColor: ['#ff6b6b', '#1dd1a1'],
             borderWidth: 0
         }]
-        },
+            },
             options: {
             responsive: true,
             plugins: {
-                legend: { position: 'bottom' },
-                title: { display: true, text: 'Ortalama Olasılık Dağılımı' }
+                legend: {
+                    position: 'bottom'
+                },
+                title: {
+                    display: true,
+                    text: 'Ortalama Olasılık Dağılımı'
+                }
             }
         }
-    });
+        });
     </script>
+    {% endif %}
 
     <script>
-    const checkboxes = document.querySelectorAll('input[name="models"]');
-    const analyzeBtn = document.getElementById('analyzeBtn');
+        document.addEventListener('DOMContentLoaded', function () {
+            const checkboxes = document.querySelectorAll('input[name="models"]');
+            const analyzeBtn = document.getElementById('analyzeBtn');
 
-    function updateButtonState() {
-        const checkedCount = document.querySelectorAll('input[name="models"]:checked').length;
-        analyzeBtn.disabled = checkedCount === 0;
-    }
+            function updateButtonState() {
+                const checkedCount = document.querySelectorAll('input[name="models"]:checked').length;
+                if (analyzeBtn) {
+                    analyzeBtn.disabled = checkedCount === 0;
+                }
+            }
 
-    checkboxes.forEach(function(box) {
-        box.addEventListener('change', updateButtonState);
-    });
-    updateButtonState();
+            checkboxes.forEach(function (box) {
+                box.addEventListener('change', updateButtonState);
+            });
+
+            // Sayfa açılışında durumu kontrol et
+            updateButtonState();
+        });
     </script>
-
-
-    {% endif %}
 
 </body>
 
